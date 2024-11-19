@@ -12,7 +12,7 @@ export const AppRouter = () => {
         {/** Login y registros */}
         <Route path="/auth/*" element={<AuthRoutes/>} />
 
-        <Route path="/home/*" element={<DashboardRoutes/>} />
+        {/* <Route path="/home/*" element={<DashboardRoutes/>} /> */}
 
         {/** Journal-App */}
         <Route path="/*" element={ <JournalRoutes/> } />
