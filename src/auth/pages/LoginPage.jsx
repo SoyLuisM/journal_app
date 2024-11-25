@@ -1,27 +1,32 @@
 import { Link as RouterLink } from "react-router-dom";
 import { Google } from "@mui/icons-material";
-import { Button, Link, TextField, Typography } from "@mui/material"
+import { Alert, Button, Link, TextField, Typography } from "@mui/material"
 import Grid from '@mui/material/Grid2';
 import { AuthLayout } from "../layout/AuthLayout";
 import { useForm } from "../../hooks";
-import { useDispatch } from "react-redux";
-import { checkingAuthentication, startGoogleSignIn } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { startGoogleSignIn, startLoginWithEmailPassword } from "../../store";
+import { useMemo } from "react";
 
 
 export const LoginPage = () => {
+  const {status,errorMessage}=useSelector(state => state.auth)
   const dispach = useDispatch()
-
-  const {email, password, onInputChange} = useForm({
+  
+  const {formState,email, password, onInputChange} = useForm({
     email: '',
     password: ''
   })
+
+  const isAuthenticating = useMemo( () => status ==="checking", [status] )
+
+
   const onSubmit = (event) =>{
     event.preventDefault()
     
-    dispach(checkingAuthentication(email,password))
+    dispach(startLoginWithEmailPassword(formState))
   }
   const onGoogleSignIn = () =>{
-    console.log("onGoogleSignIn")
     dispach(startGoogleSignIn())
   }
   return (
@@ -52,13 +57,15 @@ export const LoginPage = () => {
               onChange={onInputChange}
               />
             </Grid>
-
-            <Grid container sx={{mt: 2}} size={12} spacing={ 2 }>
+            <Grid container sx={{mt: 2}} size={12} spacing={ 2 } display={ !!errorMessage ? '': 'none'}>
+              <Alert severity="error">{errorMessage}</Alert>
+            </Grid>
+            <Grid container sx={{mt: 2}} size={12} spacing={ 2 } >
               <Grid size={{xs:12, md:6}} > 
-                <Button type="submit" variant="contained" fullWidth>Iniciar sesion</Button>
+                <Button disabled= {isAuthenticating} type="submit" variant="contained" fullWidth>Iniciar sesion</Button>
               </Grid>
               <Grid size={{xs:12, md:6}} >
-                <Button onClick={onGoogleSignIn} variant="contained" fullWidth> <Google/> <Typography sx={{ml:1}}>Google</Typography></Button>
+                <Button disabled= {isAuthenticating} onClick={onGoogleSignIn} variant="contained" fullWidth> <Google/> <Typography sx={{ml:1}}>Google</Typography></Button>
               </Grid>
             </Grid>
 
